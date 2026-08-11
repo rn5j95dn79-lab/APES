@@ -138,6 +138,8 @@
   /* ---- My Notes page ---- */
   .notes-page-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;}
   .print-btn{background:var(--teal);color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:bold;font-size:13px;font-family:Calibri,Arial,sans-serif;}
+  .export-btn{background:var(--gold);color:var(--navy-deep);border:none;padding:9px 18px;border-radius:8px;font-weight:bold;font-size:13px;font-family:Calibri,Arial,sans-serif;}
+  .notes-actions{display:flex;gap:10px;flex-wrap:wrap;}
   .name-field{display:flex;gap:10px;align-items:center;margin-bottom:20px;font-family:Calibri,Arial,sans-serif;font-size:13.5px;color:var(--ink-soft);}
   .name-field input{border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-size:13.5px;}
   .notes-summary-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:12px;}
@@ -258,6 +260,61 @@ function loadNote(id){
 function saveNote(id, text){
   try { localStorage.setItem("succession-note-" + id, text); } catch(e){}
 }
+function pad2(n){ return n < 10 ? "0" + n : "" + n; }
+function todayStr(){
+  var d = new Date();
+  return d.getFullYear() + "-" + pad2(d.getMonth()+1) + "-" + pad2(d.getDate());
+}
+function buildNotesText(){
+  var name = loadName();
+  var lines = [];
+  lines.push("ECOLOGICAL SUCCESSION -- MY NOTES");
+  lines.push("AP Environmental Science");
+  lines.push("Name: " + (name || "____________________"));
+  lines.push("Exported: " + todayStr());
+  lines.push("");
+  lines.push("========================================");
+
+  function section(label, items){
+    lines.push("");
+    lines.push(label.toUpperCase());
+    lines.push("----------------------------------------");
+    items.forEach(function(stage){
+      var noteText = loadNote(stage.id);
+      lines.push("");
+      lines.push(stage.phase + ": " + stage.title + "  (" + stage.timeframe + ")");
+      lines.push(noteText ? noteText : "[No notes recorded]");
+    });
+  }
+
+  section("Primary Succession", PRIMARY);
+  section("Secondary Succession (Fire)", SECONDARY);
+
+  lines.push("");
+  lines.push("COMPARISON & CASE STUDY");
+  lines.push("----------------------------------------");
+  var cmpNote = loadNote("compare_yellowstone");
+  lines.push("");
+  lines.push("Primary vs. Secondary + Yellowstone Case Study");
+  lines.push(cmpNote ? cmpNote : "[No notes recorded]");
+
+  return lines.join("\n");
+}
+function exportNotes(){
+  var text = buildNotesText();
+  var blob = new Blob([text], { type: "text/plain" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  var name = loadName();
+  var safeName = name ? name.trim().replace(/[^a-z0-9]+/gi, "_") : "student";
+  a.href = url;
+  a.download = "Succession_Notes_" + safeName + "_" + todayStr() + ".txt";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+
 function loadName(){
   try { return localStorage.getItem("succession-student-name") || ""; } catch(e){ return ""; }
 }
@@ -670,7 +727,10 @@ function renderQuiz(){
 function renderNotesPage(){
   var header = el("div", {class:"notes-page-header"}, [
     el("h2", {style:"color:var(--navy-deep);"}, [text("My Notes")]),
-    el("button", {class:"print-btn", onclick:function(){ window.print(); }}, [text("🖨 Print / Save Notes")])
+    el("div", {class:"notes-actions"}, [
+      el("button", {class:"export-btn", onclick:function(){ exportNotes(); }}, [text("⬇ Export as Text File")]),
+      el("button", {class:"print-btn", onclick:function(){ window.print(); }}, [text("🖨 Print / Save Notes")])
+    ])
   ]);
 
   var nameField = el("div", {class:"name-field"}, [
