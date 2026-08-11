@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ecological Succession — AP Environmental Science | B. Henriques</title>
+<style>
+  :root{
+    --navy:#132743;
+    --navy-deep:#0c1b2e;
+    --navy-light:#23456f;
+    --gold:#c9a227;
+    --gold-light:#e6c65c;
+    --teal:#1c7293;
+    --teal-light:#3fa7a0;
+    --paper:#f4f6f8;
+    --card:#ffffff;
+    --ink:#182430;
+    --ink-soft:#4b5866;
+    --line:#dde3e9;
+    --green:#3f7d4f;
+    --fire:#c1521f;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);}
+  body{font-family:Georgia,'Times New Roman',serif;}
+  h1,h2,h3,h4{font-family:'Century Schoolbook','Cambria',Georgia,serif;margin:0;}
+  button{font-family:Calibri,Arial,sans-serif;cursor:pointer;}
+  textarea, input{font-family:Calibri,Arial,sans-serif;}
+  ::-webkit-scrollbar{height:8px;width:8px;}
+  ::-webkit-scrollbar-thumb{background:rgba(28,114,147,0.35);border-radius:4px;}
+
+  #app{max-width:1100px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+
+  /* ---- Top bar ---- */
+  .topbar{background:var(--navy-deep);color:#fff;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(0,0,0,0.25);}
+  .topbar-title{display:flex;align-items:center;gap:10px;font-family:'Century Schoolbook',Georgia,serif;}
+  .topbar-title .badge{background:var(--gold);color:var(--navy-deep);font-weight:bold;font-size:11px;letter-spacing:0.06em;padding:3px 9px;border-radius:20px;text-transform:uppercase;font-family:Calibri,Arial,sans-serif;}
+  .topbar-title .name{font-size:17px;font-weight:bold;}
+  .nav-btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .nav-btns button{background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:bold;transition:background 0.15s;}
+  .nav-btns button:hover{background:rgba(255,255,255,0.2);}
+  .nav-btns button.active{background:var(--gold);color:var(--navy-deep);border-color:var(--gold);}
+
+  main{flex:1;padding:26px 22px 60px;}
+
+  /* ---- Cover ---- */
+  .cover{min-height:82vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle at 50% 0%, var(--navy-light), var(--navy-deep) 70%);color:#fff;border-radius:16px;padding:60px 30px;margin-top:10px;}
+  .cover .kicker{color:var(--gold-light);text-transform:uppercase;letter-spacing:0.14em;font-size:13px;font-family:Calibri,Arial,sans-serif;font-weight:bold;margin-bottom:16px;}
+  .cover h1{font-size:44px;margin-bottom:14px;}
+  .cover .sub{font-size:18px;color:#cfe0ee;max-width:620px;line-height:1.5;margin-bottom:28px;}
+  .cover .divider{width:70px;height:3px;background:var(--gold);margin:0 0 28px;border-radius:2px;}
+  .cover-desc{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:20px 24px;max-width:640px;text-align:left;margin-bottom:30px;}
+  .cover-desc div.t{font-weight:bold;color:var(--gold-light);font-family:Calibri,Arial,sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+  .cover-desc p{font-size:15px;line-height:1.6;color:#e4ecf3;margin:0;}
+  .cover button.start{background:var(--gold);color:var(--navy-deep);border:none;padding:14px 34px;font-size:16px;font-weight:bold;border-radius:30px;font-family:Calibri,Arial,sans-serif;}
+  .cover .foot{margin-top:26px;font-size:12.5px;color:#93a8bc;font-family:Calibri,Arial,sans-serif;}
+
+  /* ---- Home ---- */
+  .home-hero{text-align:center;padding:20px 10px 10px;}
+  .home-hero h2{font-size:30px;color:var(--navy-deep);}
+  .home-hero p{max-width:700px;margin:12px auto 0;color:var(--ink-soft);font-size:15.5px;line-height:1.6;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:30px;}
+  .path-card{background:var(--card);border-radius:14px;padding:24px;border:1px solid var(--line);box-shadow:0 3px 10px rgba(19,39,67,0.06);transition:transform .15s, box-shadow .15s;}
+  .path-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(19,39,67,0.12);}
+  .path-card .icon{font-size:34px;}
+  .path-card h3{margin:10px 0 6px;color:var(--navy-deep);font-size:19px;}
+  .path-card p{color:var(--ink-soft);font-size:13.5px;line-height:1.5;font-family:Calibri,Arial,sans-serif;margin:0 0 16px;}
+  .path-card button{width:100%;padding:10px;border-radius:8px;border:none;font-weight:bold;font-size:13.5px;color:#fff;}
+  .path-card.primary button{background:var(--teal);}
+  .path-card.secondary button{background:var(--fire);}
+  .path-card.compare button{background:var(--navy);}
+  .path-card.notes button{background:var(--gold);color:var(--navy-deep);}
+
+  /* ---- Stage view ---- */
+  .stage-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+  .stage-header h2{color:var(--navy-deep);font-size:24px;}
+  .track-pill{font-family:Calibri,Arial,sans-serif;font-weight:bold;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;padding:5px 12px;border-radius:20px;color:#fff;}
+  .track-pill.primary{background:var(--teal);}
+  .track-pill.secondary{background:var(--fire);}
+
+  .timeline{display:flex;gap:6px;overflow-x:auto;padding:6px 2px 18px;}
+  .timeline button{flex:0 0 auto;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:bold;color:var(--ink-soft);font-family:Calibri,Arial,sans-serif;white-space:nowrap;}
+  .timeline button.active.primary{border-color:var(--teal);background:var(--teal);color:#fff;}
+  .timeline button.active.secondary{border-color:var(--fire);background:var(--fire);color:#fff;}
+
+  .stage-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;}
+  @media(max-width:820px){.stage-grid{grid-template-columns:1fr;}}
+  .sketch-box{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 3px 10px rgba(19,39,67,0.06);}
+  .sketch-box .cap{padding:10px 16px;background:var(--navy-deep);color:#fff;font-family:Calibri,Arial,sans-serif;font-size:12.5px;font-weight:bold;display:flex;justify-content:space-between;}
+  .sketch-box .cap .tf{color:var(--gold-light);}
+
+  .info-box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:0 3px 10px rgba(19,39,67,0.06);}
+  .info-box h3{color:var(--navy-deep);font-size:19px;margin-bottom:8px;}
+  .info-box .desc{font-size:14.5px;line-height:1.6;color:var(--ink);margin-bottom:14px;}
+  .info-box .label{font-family:Calibri,Arial,sans-serif;font-weight:bold;font-size:11.5px;text-transform:uppercase;letter-spacing:0.06em;color:var(--teal);margin:14px 0 6px;}
+  .info-box ul{margin:0;padding-left:20px;font-size:13.5px;line-height:1.6;color:var(--ink);}
+  .fact-box{margin-top:14px;background:#fbf6e6;border:1px solid #ecd88f;border-radius:10px;padding:12px 14px;font-size:13px;font-family:Calibri,Arial,sans-serif;color:#5c4a10;}
+  .fact-box b{color:var(--navy-deep);}
+
+  .notes-box{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 3px 10px rgba(19,39,67,0.06);}
+  .notes-box .label{display:flex;align-items:center;justify-content:space-between;font-family:Calibri,Arial,sans-serif;font-weight:bold;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--navy);margin-bottom:8px;}
+  .notes-box .saved{color:var(--teal);font-weight:normal;font-size:11px;text-transform:none;letter-spacing:0;}
+  .notes-box textarea{width:100%;min-height:90px;resize:vertical;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.5;color:var(--ink);background:#fbfcfd;}
+  .notes-box textarea:focus{outline:2px solid var(--teal-light);}
+
+  .stage-footer{display:flex;justify-content:space-between;margin-top:20px;gap:10px;}
+  .stage-footer button{background:var(--navy);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;font-size:13.5px;}
+  .stage-footer button:disabled{opacity:0.35;}
+
+  /* ---- Compare ---- */
+  .compare-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 3px 10px rgba(19,39,67,0.06);font-size:14px;}
+  .compare-table th{background:var(--navy-deep);color:#fff;padding:12px 16px;text-align:left;font-family:Calibri,Arial,sans-serif;font-size:12.5px;text-transform:uppercase;letter-spacing:0.05em;}
+  .compare-table td{padding:12px 16px;border-bottom:1px solid var(--line);}
+  .compare-table tr:last-child td{border-bottom:none;}
+  .compare-table td.label{font-weight:bold;color:var(--navy-deep);width:26%;font-family:Calibri,Arial,sans-serif;}
+
+  .case-study{margin-top:26px;background:linear-gradient(135deg, var(--navy-deep), var(--navy));color:#fff;border-radius:14px;padding:26px 28px;}
+  .case-study h3{color:var(--gold-light);font-size:20px;margin-bottom:10px;}
+  .case-study p{font-size:14.5px;line-height:1.65;color:#dde8f0;margin:0 0 10px;}
+  .case-study .stats{display:flex;gap:20px;flex-wrap:wrap;margin-top:16px;}
+  .case-study .stat{background:rgba(255,255,255,0.08);border-radius:10px;padding:12px 18px;min-width:120px;}
+  .case-study .stat .n{font-size:24px;font-weight:bold;color:var(--gold-light);font-family:Calibri,Arial,sans-serif;}
+  .case-study .stat .l{font-size:11.5px;color:#c3d4e2;font-family:Calibri,Arial,sans-serif;}
+
+  /* ---- Quiz ---- */
+  .quiz-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:16px;box-shadow:0 3px 10px rgba(19,39,67,0.06);}
+  .quiz-card .q{font-weight:bold;font-size:15px;color:var(--navy-deep);margin-bottom:12px;}
+  .quiz-card .opt{display:block;width:100%;text-align:left;background:#fbfcfd;border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13.5px;font-family:Calibri,Arial,sans-serif;}
+  .quiz-card .opt.correct{background:#e6f4ea;border-color:var(--green);color:#1e5128;font-weight:bold;}
+  .quiz-card .opt.incorrect{background:#fbe8e4;border-color:var(--fire);color:#8c2f0f;font-weight:bold;}
+  .quiz-card .opt:disabled{cursor:default;}
+  .quiz-card .expl{margin-top:10px;background:var(--paper);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--ink-soft);font-family:Calibri,Arial,sans-serif;display:none;}
+  .quiz-card .expl.show{display:block;}
+  .quiz-score{text-align:center;background:var(--navy-deep);color:#fff;border-radius:14px;padding:30px;}
+  .quiz-score .n{font-size:44px;font-weight:bold;color:var(--gold-light);font-family:Calibri,Arial,sans-serif;}
+
+  /* ---- My Notes page ---- */
+  .notes-page-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;}
+  .print-btn{background:var(--teal);color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:bold;font-size:13px;font-family:Calibri,Arial,sans-serif;}
+  .name-field{display:flex;gap:10px;align-items:center;margin-bottom:20px;font-family:Calibri,Arial,sans-serif;font-size:13.5px;color:var(--ink-soft);}
+  .name-field input{border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-size:13.5px;}
+  .notes-summary-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:12px;}
+  .notes-summary-card h4{color:var(--navy-deep);font-size:14.5px;margin-bottom:2px;}
+  .notes-summary-card .tf{font-size:11px;color:var(--ink-soft);font-family:Calibri,Arial,sans-serif;margin-bottom:8px;}
+  .notes-summary-card .txt{font-size:13.5px;color:var(--ink);white-space:pre-wrap;line-height:1.5;}
+  .notes-summary-card .empty{color:#a7b2bc;font-style:italic;}
+
+  footer.appfoot{text-align:center;padding:20px;color:#93a2af;font-size:11.5px;font-family:Calibri,Arial,sans-serif;}
+
+  @media print{
+    .topbar,.nav-btns,.stage-footer,.timeline,.print-btn,.cover button{display:none !important;}
+    body{background:#fff;}
+    #app{max-width:100%;}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+(function () {
+"use strict";
+
+/* ============================================================
+   DATA
+   ============================================================ */
+
+var PRIMARY = [
+  { id:"p1", phase:"Stage 1", title:"Bare Rock / Sterile Substrate", timeframe:"Year 0",
+    desc:"A brand-new surface with no soil and no life — created by a retreating glacier, a cooling lava flow, or a landslide that strips everything away. There is nothing here yet for most organisms to use.",
+    details:["No soil, no organic matter, no seed bank","Surface is exposed to full sun, wind, and temperature extremes","Any colonizer must survive on bare mineral rock"],
+    fact:"Glacier Bay, Alaska is one of the best-studied primary succession sites on Earth — scientists have tracked the same retreating-glacier terrain for over a century.", color:"#8d7a63"},
+  { id:"p2", phase:"Stage 2", title:"Pioneer Species — Lichens & Mosses", timeframe:"Years 1–50",
+    desc:"Lichens (a partnership between fungi and algae/cyanobacteria) are usually the very first colonizers. They cling to bare rock, secrete weak acids that slowly break the rock down, and trap wind-blown dust and dead tissue to begin building the first thin layer of soil.",
+    details:["Lichens chemically & physically weather the rock","Mosses follow once a thin soil skin exists","Nitrogen-fixing cyanobacteria add usable nitrogen to the new soil"],
+    fact:"It can take lichens decades just to build a few millimeters of soil — this is why primary succession is measured in centuries, not years.", color:"#6f8f6a"},
+  { id:"p3", phase:"Stage 3", title:"Grasses & Herbaceous Plants", timeframe:"Years 50–100",
+    desc:"Once enough organic soil has accumulated, wind- and animal-dispersed seeds of grasses and small flowering plants can take root. Their roots further break up the rock and add much more organic matter as they die back each year.",
+    details:["Root systems increase soil depth and water retention","Organic matter (humus) begins to accumulate rapidly","More available nutrients support a wider range of species"],
+    fact:"This is the fastest-changing stage of primary succession — soil depth and species diversity can multiply within just a few decades.", color:"#8fae52"},
+  { id:"p4", phase:"Stage 4", title:"Shrubs & Small Woody Plants", timeframe:"Years 100–200",
+    desc:"With deeper, richer soil now in place, woody shrubs and small trees can establish. These plants shade out some of the grasses and herbs, changing the light and moisture conditions at ground level.",
+    details:["Increased shade and shelter attract insects, birds, small mammals","Root networks stabilize soil against erosion","Species diversity continues climbing"],
+    fact:"Shrub-stage communities often see the fastest increase in animal diversity, as insects and birds arrive to use the new structure for food and shelter.", color:"#5c8a5a"},
+  { id:"p5", phase:"Stage 5", title:"Pioneer Trees (Shade-Intolerant)", timeframe:"Years 200–500",
+    desc:"Fast-growing, sun-loving trees (like pines, birches, or aspens) move in and form the first forest canopy. These species grow quickly in full sun but cannot reproduce well once their own canopy shades the ground below.",
+    details:["Canopy closes, creating deep shade at ground level","Understory conditions become too dark for the pioneer trees' own seedlings","Slower-growing, shade-tolerant tree seedlings begin to establish underneath"],
+    fact:"Pioneer trees are, in effect, planting the seeds of their own replacement — the next generation of trees will be entirely different species.", color:"#3f6b47"},
+  { id:"p6", phase:"Stage 6", title:"Climax Community", timeframe:"500+ Years",
+    desc:"A relatively stable, self-sustaining community — often a shade-tolerant hardwood or mixed forest — dominates. Species composition changes very slowly from this point, as the ecosystem has reached equilibrium with its climate and soil.",
+    details:["High biodiversity and complex food webs","Soil is deep, rich, and well developed","Community remains relatively stable until the next major disturbance"],
+    fact:"A 'climax community' is stable, not permanent — a new disturbance (fire, storm, human activity) can reset the process at any time.", color:"#264d34"}
+];
+
+var SECONDARY = [
+  { id:"s1", phase:"Stage 1", title:"Disturbance — Wildfire", timeframe:"Day 0",
+    desc:"A wildfire sweeps through a forest or grassland, killing most above-ground vegetation. Unlike primary succession's bare rock, the soil and its seed bank, roots, and nutrients largely survive underground.",
+    details:["Soil structure and nutrients remain (often nutrient-enriched by ash)","Seed bank, roots, and underground stems (rhizomes) survive intact","Sunlight suddenly floods the forest floor"],
+    fact:"Fire isn't purely destructive — many fire-adapted ecosystems, like tallgrass prairie and lodgepole pine forest, actually depend on periodic burns to stay healthy.", color:"#c1521f"},
+  { id:"s2", phase:"Stage 2", title:"Fast Colonizers — Grasses & Fireweed", timeframe:"Weeks–Months 1",
+    desc:"Because soil and a seed bank already exist, recovery starts almost immediately. Fast-growing grasses, wildflowers, and fire-adapted species like fireweed sprout from surviving roots and dormant seeds within weeks.",
+    details:["Some seeds are actually triggered to germinate by heat or smoke","Surviving root systems resprout quickly (resprouting)","Ash adds a pulse of available nutrients (nitrogen, phosphorus, potassium)"],
+    fact:"Fireweed gets its name because it is often the very first wildflower to bloom across a burned landscape — sometimes within a single growing season.", color:"#a3c15a"},
+  { id:"s3", phase:"Stage 3", title:"Shrubs & Perennial Herbs", timeframe:"Years 1–10",
+    desc:"Shrubs and longer-lived herbaceous perennials replace the first wave of fast annual colonizers. Soil structure and organic matter continue rebuilding, and cover for wildlife increases.",
+    details:["Species diversity rises quickly compared to primary succession","Soil never had to form from scratch — recovery is much faster","Small mammals and birds return as shelter increases"],
+    fact:"Because soil is already present, this stage alone can take less time than the entire pioneer-lichen stage of primary succession.", color:"#6f9e56"},
+  { id:"s4", phase:"Stage 4", title:"Fire-Adapted Pioneer Trees", timeframe:"Years 10–50",
+    desc:"Fast-growing, shade-intolerant trees such as aspen, birch, or jack/lodgepole pine establish a new canopy. Many of these species have specific adaptations that make them especially good at recolonizing after fire.",
+    details:["Serotinous cones (lodgepole & jack pine) open only when heated by fire, releasing a fresh seed crop right after a burn","Aspen resprouts rapidly from an intact underground root system","Thick bark in some species (e.g., ponderosa pine) helps mature trees survive future low-intensity fires"],
+    fact:"A serotinous pine cone can stay sealed on a tree for decades, waiting for exactly the fire event that will melt its resin and release its seeds.", color:"#4c7a4a"},
+  { id:"s5", phase:"Stage 5", title:"Shade-Tolerant Trees Establish", timeframe:"Years 50–150",
+    desc:"As the pioneer tree canopy closes and shades the ground, slower-growing, shade-tolerant species (such as spruce or fir) begin establishing in the understory, just as in primary succession's later stages.",
+    details:["Species composition starts shifting toward long-term climax species","Understory light levels drop as canopy density increases","Soil organic matter and nutrient cycling stabilize further"],
+    fact:"From this point on, secondary succession and primary succession follow a very similar path — the big difference was how fast they got here.", color:"#356b46"},
+  { id:"s6", phase:"Stage 6", title:"Climax Community Re-Established", timeframe:"150+ Years",
+    desc:"The ecosystem returns to a mature, relatively stable community. Depending on fire frequency and severity, this may closely resemble the pre-fire forest, or shift toward a different but stable mix of species.",
+    details:["Full recovery may take generations, even though it's far faster than primary succession","Biodiversity and structural complexity return to pre-disturbance levels","The ecosystem is once again primed to be reset by the next disturbance"],
+    fact:"Because soil and a seed bank survive, secondary succession after fire can reach a mature forest in roughly 100–150 years — compared to 1,000+ years for primary succession from bare rock.", color:"#1f4530"}
+];
+
+var QUIZ = [
+  { q:"What is the key difference between primary and secondary succession?",
+    opts:["Primary succession happens faster than secondary succession","Primary succession starts with no soil present; secondary succession starts with soil already present","Secondary succession only happens after fires","Primary succession only occurs in forests"],
+    correct:1,
+    expl:"Primary succession begins on bare rock or sterile substrate with no soil. Secondary succession begins after a disturbance (like fire) where soil, seeds, and roots already exist — which is exactly why it moves so much faster." },
+  { q:"Why are lichens usually the first species to colonize bare rock in primary succession?",
+    opts:["They need thick soil to grow","They can chemically and physically break down rock and don't need existing soil","They are the fastest-growing plant on Earth","They are brought in by wildfire"],
+    correct:1,
+    expl:"Lichens can survive directly on bare rock. They secrete weak acids that weather the rock and trap debris, slowly building the very first layer of soil for later species." },
+  { q:"What is a serotinous cone, and why does it matter after a wildfire?",
+    opts:["A cone that only grows in primary succession","A cone sealed with resin that opens specifically when heated by fire, releasing seeds right after a burn","A cone that prevents any tree regrowth after fire","A type of moss that grows on burned soil"],
+    correct:1,
+    expl:"Serotinous cones (found in lodgepole and jack pine) stay sealed by resin until heat from a fire melts it open — timing seed release perfectly with a freshly cleared, nutrient-rich, sunlit forest floor." },
+  { q:"Why does secondary succession after a fire generally happen faster than primary succession?",
+    opts:["Fires make soil disappear, which speeds up regrowth","Soil, seed banks, and root systems typically survive the fire, so colonizers don't have to build soil from scratch","Secondary succession skips the pioneer species stage entirely","There is no real difference in speed between the two"],
+    correct:1,
+    expl:"Because fire usually leaves soil structure and a seed bank intact underground, plants can resprout or germinate almost immediately — skipping the centuries-long soil-building process that primary succession requires." },
+  { q:"Which best describes a 'climax community'?",
+    opts:["A community that never changes again under any circumstances","A relatively stable, self-sustaining community that will persist until the next major disturbance","The very first species to colonize an area","A community found only after wildfires"],
+    correct:1,
+    expl:"A climax community is relatively stable and self-sustaining — but 'stable' doesn't mean 'permanent.' A new disturbance can reset succession at any time." },
+  { q:"An aspen forest resprouts vigorously from its root system almost immediately after a burn. What term describes this survival strategy?",
+    opts:["Serotiny","Resprouting","Primary colonization","Climax stability"],
+    correct:1,
+    expl:"Resprouting is regrowth from surviving roots, stems, or root crowns after a disturbance — a key fire adaptation that lets species like aspen recover very quickly without needing new seeds at all." }
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+var state = { view:"cover", track:"primary", stageIndex:0, quizAnswers:{}, studentName:"" };
+
+function loadNote(id){
+  try { return localStorage.getItem("succession-note-" + id) || ""; } catch(e){ return ""; }
+}
+function saveNote(id, text){
+  try { localStorage.setItem("succession-note-" + id, text); } catch(e){}
+}
+function loadName(){
+  try { return localStorage.getItem("succession-student-name") || ""; } catch(e){ return ""; }
+}
+function saveName(name){
+  try { localStorage.setItem("succession-student-name", name); } catch(e){}
+}
+
+var ALL_STAGES = PRIMARY.concat(SECONDARY);
+
+/* ============================================================
+   SKETCHES  (inline SVG, no external assets)
+   ============================================================ */
+function sketch(stageId){
+  var c = { w:"100%", h:"210" };
+  function svgOpen(){ return '<svg width="' + c.w + '" height="' + c.h + '" viewBox="0 0 400 210" xmlns="http://www.w3.org/2000/svg">'; }
+
+  if (stageId === "p1") {
+    return svgOpen() +
+      '<rect width="400" height="210" fill="#e7e2d9"/>' +
+      '<path d="M0 150 L60 100 L110 140 L170 90 L230 145 L300 105 L400 150 V210 H0 Z" fill="#9c8f7e"/>' +
+      '<path d="M0 165 L80 130 L150 160 L220 120 L280 165 L400 130 V210 H0 Z" fill="#7d7062"/>' +
+      '<circle cx="90" cy="55" r="20" fill="#f4d78a"/>' +
+      '</svg>';
+  }
+  if (stageId === "p2") {
+    return svgOpen() +
+      '<rect width="400" height="210" fill="#e7e2d9"/>' +
+      '<path d="M0 165 L80 130 L150 160 L220 120 L280 165 L400 130 V210 H0 Z" fill="#8a7d6c"/>' +
+      '<ellipse cx="100" cy="150" rx="26" ry="10" fill="#8fae52"/>' +
+      '<ellipse cx="230" cy="128" rx="30" ry="11" fill="#6f8f6a"/>' +
+      '<ellipse cx="310" cy="155" rx="22" ry="8" fill="#8fae52"/>' +
+      '<circle cx="90" cy="50" r="18" fill="#f4d78a"/>' +
+      '</svg>';
+  }
+  if (stageId === "p3") {
+    return svgOpen() +
+      '<rect width="400" height="210" fill="#eef1e4"/>' +
+      '<rect x="0" y="150" width="400" height="60" fill="#8a9c5e"/>' +
+      (function(){ var s=""; for (var i=0;i<26;i++){ var x=8+i*15; s += '<line x1="'+x+'" y1="'+(150)+'" x2="'+(x-4)+'" y2="'+(125)+'" stroke="#6f8a45" stroke-width="2"/>'; } return s; })() +
+      '<circle cx="330" cy="45" r="22" fill="#f4d78a"/>' +
+      '</svg>';
+  }
+  if (stageId === "p4") {
+    return svgOpen() +
+      '<rect width="400" height="210" fill="#eef1e4"/>' +
+      '<rect x="0" y="160" width="400" height="50" fill="#79905a"/>' +
+      '<circle cx="70" cy="135" r="28" fill="#5c8a5a"/><rect x="65" y="150" width="10" height="20" fill="#6b4a2e"/>' +
+      '<circle cx="170" cy="120" r="34" fill="#4f7c50"/><rect x="163" y="140" width="12" height="26" fill="#6b4a2e"/>' +
+      '<circle cx="290" cy="130" r="30" fill="#5c8a5a"/><rect x="283" y="148" width="10" height="20" fill="#6b4a2e"/>' +
+      '<circle cx="350" cy="45" r="20" fill="#f4d78a"/>' +
+      '</svg>';
+  }
+  if (stageId === "p5") {
+    return svgOpen() +
+      '<rect width="400" height="210" fill="#dcebe6"/>' +
+      '<rect x="0" y="175" width="400" height="35" fill="#6f8a56"/>' +
+      '<polygon points="80,60 40,175 120,175" fill="#3f6b47"/><polygon points="80,90 50,175 110,175" fill="#356050"/>' +
+      '<polygon points="190,45 140,175 240,175" fill="#3f6b47"/><polygon points="190,80 155,175 225,175" fill="#356050"/>' +
+      '<polygon points="310,65 270,175 350,175" fill="#3f6b47"/><polygon points="310,95 280,175 340,175" fill="#356050"/>' +
+      '<circle cx="355" cy="35" r="16" fill="#f4d78a"/>' +
+      '</svg>';
+  }
+  if (stageId === "p6") {
+    return svgOpen() +
+      '<rect width="400" height="210" fill="#cfe4de"/>' +
+      '<rect x="0" y="182" width="400" height="28" fill="#4f6b3c"/>' +
+      (function(){ var s=""; var xs=[30,80,130,180,230,280,330,370]; for (var i=0;i<xs.length;i++){ var x=xs[i]; var h=70+((i%3)*20); s += '<polygon points="'+x+','+(182-h)+' '+(x-30)+',182 '+(x+30)+',182" fill="'+(i%2===0?"#264d34":"#2e5c3d")+'"/>'; } return s; })() +
+      '<circle cx="60" cy="35" r="14" fill="#f4d78a"/>' +
+      '</svg>';
+  }
+
+  /* Secondary / fire track */
+  if (stageId === "s1") {
+    return svgOpen() +
+      '<rect width="400" height="210" fill="#3a2a22"/>' +
+      '<polygon points="60,180 30,140 60,150 70,110 90,150 110,120 120,180" fill="#231a15"/>' +
+      '<polygon points="200,180 170,120 195,140 215,80 235,140 255,110 270,180" fill="#231a15"/>' +
+      '<polygon points="330,180 310,150 335,160 350,120 365,160 380,150 390,180" fill="#231a15"/>' +
+      '<polygon points="195,140 205,90 215,120 225,60 240,120 250,90 260,140" fill="#e8641f" opacity="0.9"/>' +
+      '<polygon points="205,130 212,100 220,118 228,80 238,118 246,100 252,130" fill="#f6a13a"/>' +
+      '<rect x="0" y="180" width="400" height="30" fill="#1c130f"/>' +
+      '</svg>';
+  }
+  if (stageId === "s2") {
+    return svgOpen() +
+      '<rect width="400" height="210" fill="#efe7dc"/>' +
+      '<rect x="0" y="175" width="400" height="35" fill="#3f312a"/>' +
+      (function(){ var s=""; for (var i=0;i<10;i++){ var x=20+i*38; s += '<line x1="'+x+'" y1="175" x2="'+x+'" y2="145" stroke="#7a4b7d" stroke-width="3"/><circle cx="'+x+'" cy="140" r="5" fill="#b672c2"/>'; } return s; })() +
+      (function(){ var s=""; for (var i=0;i<8;i++){ var x=35+i*44; s += '<ellipse cx="'+x+'" cy="176" rx="10" ry="4" fill="#8fae52"/>'; } return s; })() +
+      '<circle cx="340" cy="40" r="20" fill="#f4d78a"/>' +
+      '</svg>';
+  }
+  if (stageId === "s3") {
+    return svgOpen() +
+      '<rect width="400" height="210" fill="#eef1e4"/>' +
+      '<rect x="0" y="165" width="400" height="45" fill="#7f9a5a"/>' +
+      '<circle cx="90" cy="145" r="22" fill="#6f9e56"/><circle cx="220" cy="140" r="26" fill="#5f8f4c"/><circle cx="330" cy="148" r="20" fill="#6f9e56"/>' +
+      '<circle cx="345" cy="42" r="18" fill="#f4d78a"/>' +
+      '</svg>';
+  }
+  if (stageId === "s4") {
+    return svgOpen() +
+      '<rect width="400" height="210" fill="#e4eee8"/>' +
+      '<rect x="0" y="178" width="400" height="32" fill="#6f8a56"/>' +
+      '<rect x="66" y="120" width="10" height="58" fill="#7a5a3a"/><circle cx="71" cy="105" r="30" fill="#4c7a4a"/>' +
+      '<rect x="186" y="100" width="12" height="78" fill="#7a5a3a"/><circle cx="192" cy="82" r="36" fill="#3f6b47"/>' +
+      '<rect x="306" y="118" width="10" height="60" fill="#7a5a3a"/><circle cx="311" cy="100" r="28" fill="#4c7a4a"/>' +
+      '<circle cx="311" cy="100" r="6" fill="#a3773a"/>' +
+      '<circle cx="40" cy="40" r="16" fill="#f4d78a"/>' +
+      '</svg>';
+  }
+  if (stageId === "s5") {
+    return svgOpen() +
+      '<rect width="400" height="210" fill="#dcebe6"/>' +
+      '<rect x="0" y="180" width="400" height="30" fill="#6f8a56"/>' +
+      '<polygon points="90,55 55,180 125,180" fill="#356b46"/>' +
+      '<polygon points="210,40 165,180 255,180" fill="#356b46"/>' +
+      '<polygon points="320,60 285,180 355,180" fill="#356b46"/>' +
+      '<rect x="30" y="150" width="8" height="30" fill="#7a5a3a"/><circle cx="34" cy="140" r="18" fill="#4c7a4a"/>' +
+      '<circle cx="360" cy="38" r="16" fill="#f4d78a"/>' +
+      '</svg>';
+  }
+  if (stageId === "s6") {
+    return svgOpen() +
+      '<rect width="400" height="210" fill="#cfe4de"/>' +
+      '<rect x="0" y="184" width="400" height="26" fill="#3a5a2e"/>' +
+      (function(){ var s=""; var xs=[25,70,115,160,205,250,295,340,380]; for (var i=0;i<xs.length;i++){ var x=xs[i]; var h=65+((i%4)*18); s += '<polygon points="'+x+','+(184-h)+' '+(x-26)+',184 '+(x+26)+',184" fill="'+(i%2===0?"#1f4530":"#2a5539")+'"/>'; } return s; })() +
+      '<circle cx="55" cy="32" r="13" fill="#f4d78a"/>' +
+      '</svg>';
+  }
+  return svgOpen() + '</svg>';
+}
+
+/* ============================================================
+   RENDER HELPERS
+   ============================================================ */
+var app = document.getElementById("app");
+
+function el(tag, attrs, children){
+  var e = document.createElement(tag);
+  attrs = attrs || {};
+  for (var k in attrs){
+    if (k === "class") e.className = attrs[k];
+    else if (k === "html") e.innerHTML = attrs[k];
+    else if (k.indexOf("on") === 0) e.addEventListener(k.slice(2), attrs[k]);
+    else e.setAttribute(k, attrs[k]);
+  }
+  children = children || [];
+  for (var i=0;i<children.length;i++){ if (children[i]) e.appendChild(children[i]); }
+  return e;
+}
+function text(str){ return document.createTextNode(str); }
+
+function setView(v, extra){
+  state.view = v;
+  if (extra) for (var k in extra) state[k] = extra[k];
+  render();
+  window.scrollTo(0,0);
+}
+
+/* ---- Top bar ---- */
+function topBar(){
+  var bar = el("div", {class:"topbar"});
+  var titleWrap = el("div", {class:"topbar-title"}, [
+    el("span", {class:"badge"}, [text("AP Env Sci")]),
+    el("span", {class:"name"}, [text("Ecological Succession")])
+  ]);
+  var navs = el("div", {class:"nav-btns"}, [
+    el("button", {class: state.view==="home"?"active":"", onclick:function(){ setView("home"); }}, [text("Home")]),
+    el("button", {class: (state.view==="stage"&&state.track==="primary")?"active":"", onclick:function(){ setView("stage", {track:"primary", stageIndex:0}); }}, [text("Primary")]),
+    el("button", {class: (state.view==="stage"&&state.track==="secondary")?"active":"", onclick:function(){ setView("stage", {track:"secondary", stageIndex:0}); }}, [text("Secondary (Fire)")]),
+    el("button", {class: state.view==="compare"?"active":"", onclick:function(){ setView("compare"); }}, [text("Compare")]),
+    el("button", {class: state.view==="quiz"?"active":"", onclick:function(){ setView("quiz"); }}, [text("Quiz")]),
+    el("button", {class: state.view==="notes"?"active":"", onclick:function(){ setView("notes"); }}, [text("My Notes")])
+  ]);
+  bar.appendChild(titleWrap);
+  bar.appendChild(navs);
+  return bar;
+}
+
+/* ---- Cover ---- */
+function renderCover(){
+  var wrap = el("div", {class:"cover"}, [
+    el("div", {class:"kicker"}, [text("AP Environmental Science · Interactive Unit Resource")]),
+    el("h1"), 
+    el("div", {class:"sub"}),
+    el("div", {class:"divider"}),
+    el("div", {class:"cover-desc"}, [
+      el("div", {class:"t"}, [text("What's Inside")]),
+      el("p")
+    ]),
+    el("button", {class:"start", onclick:function(){ setView("home"); }}, [text("Begin →")]),
+    el("div", {class:"foot"})
+  ]);
+  wrap.children[1].appendChild(text("Ecological Succession"));
+  wrap.children[2].appendChild(text("How does bare rock become a forest — and how does a forest come back after a wildfire?"));
+  wrap.children[4].children[1].appendChild(text("Work through 6 stages of Primary Succession (bare rock → climax forest) and 6 stages of Secondary Succession triggered by wildfire, compare the two pathways side by side, take guided notes as you go, and finish with a knowledge-check quiz."));
+  wrap.children[6].appendChild(text("B. Henriques · AP Environmental Science"));
+  return wrap;
+}
+
+/* ---- Home ---- */
+function renderHome(){
+  var hero = el("div", {class:"home-hero"}, [
+    el("h2", {}, [text("Ecological Succession")]),
+    el("p", {}, [text("Ecosystems are always changing. Explore how a community of organisms develops over time from nothing at all (primary succession), and how it redevelops after a disturbance like wildfire (secondary succession).")])
+  ]);
+  var cards = el("div", {class:"cards"}, [
+    el("div", {class:"path-card primary"}, [
+      el("div", {class:"icon"}, [text("🪨")]),
+      el("h3", {}, [text("Primary Succession")]),
+      el("p", {}, [text("Starts on bare rock or sterile ground — no soil, no seed bank. Six stages from lichens to climax forest.")]),
+      el("button", {onclick:function(){ setView("stage", {track:"primary", stageIndex:0}); }}, [text("Start Primary →")])
+    ]),
+    el("div", {class:"path-card secondary"}, [
+      el("div", {class:"icon"}, [text("🔥")]),
+      el("h3", {}, [text("Secondary Succession")]),
+      el("p", {}, [text("Starts after a wildfire, where soil and a seed bank already survive. Six stages of post-fire recovery.")]),
+      el("button", {onclick:function(){ setView("stage", {track:"secondary", stageIndex:0}); }}, [text("Start Secondary →")])
+    ]),
+    el("div", {class:"path-card compare"}, [
+      el("div", {class:"icon"}, [text("⚖️")]),
+      el("h3", {}, [text("Compare & Case Study")]),
+      el("p", {}, [text("See both pathways side by side, plus a real wildfire case study (Yellowstone, 1988).")]),
+      el("button", {onclick:function(){ setView("compare"); }}, [text("Compare →")])
+    ]),
+    el("div", {class:"path-card notes"}, [
+      el("div", {class:"icon"}, [text("📝")]),
+      el("h3", {}, [text("My Notes")]),
+      el("p", {}, [text("Review everything you've written across every stage, then print or save your guided notes.")]),
+      el("button", {onclick:function(){ setView("notes"); }}, [text("View My Notes →")])
+    ])
+  ]);
+  return el("div", {}, [hero, cards]);
+}
+
+/* ---- Stage view ---- */
+function renderStage(){
+  var list = state.track === "primary" ? PRIMARY : SECONDARY;
+  var idx = Math.max(0, Math.min(state.stageIndex, list.length-1));
+  var stage = list[idx];
+
+  var header = el("div", {class:"stage-header"}, [
+    el("h2", {}, [text((state.track==="primary"?"Primary Succession":"Secondary Succession — Wildfire") )]),
+    el("span", {class:"track-pill " + state.track}, [text(state.track==="primary"?"Primary Track":"Secondary Track")])
+  ]);
+
+  var timeline = el("div", {class:"timeline"});
+  list.forEach(function(s, i){
+    timeline.appendChild(el("button", {
+      class: (i===idx ? "active " + state.track : ""),
+      onclick: function(){ setView("stage", {track: state.track, stageIndex: i}); }
+    }, [text((i+1) + ". " + s.title)]));
+  });
+
+  var sketchBox = el("div", {class:"sketch-box"}, [
+    el("div", {class:"cap"}, [ el("span",{},[text(stage.phase + " — " + stage.title)]), el("span",{class:"tf"},[text(stage.timeframe)]) ]),
+    el("div", {html: sketch(stage.id)})
+  ]);
+
+  var detailList = el("ul");
+  stage.details.forEach(function(d){ detailList.appendChild(el("li", {}, [text(d)])); });
+
+  var infoBox = el("div", {class:"info-box"}, [
+    el("h3", {}, [text(stage.title)]),
+    el("div", {class:"desc"}, [text(stage.desc)]),
+    el("div", {class:"label"}, [text("Key Points")]),
+    detailList,
+    el("div", {class:"fact-box"}, [ el("b",{},[text("Did you know? ")]), text(stage.fact) ])
+  ]);
+
+  var grid = el("div", {class:"stage-grid"}, [sketchBox, infoBox]);
+
+  var savedTag = el("span", {class:"saved"}, [text("")]);
+  var ta = el("textarea", {placeholder:"Write your notes on this stage here... (autosaves as you type)"});
+  ta.value = loadNote(stage.id);
+  ta.addEventListener("input", function(){
+    saveNote(stage.id, ta.value);
+    savedTag.textContent = "Saved ✓";
+    clearTimeout(ta._t);
+    ta._t = setTimeout(function(){ savedTag.textContent = ""; }, 1500);
+  });
+  var notesBox = el("div", {class:"notes-box"}, [
+    el("div", {class:"label"}, [ text("Guided Notes — " + stage.title), savedTag ]),
+    ta
+  ]);
+
+  var prevBtn = el("button", { onclick:function(){ if (idx>0) setView("stage", {track:state.track, stageIndex: idx-1}); } }, [text("← Previous Stage")]);
+  if (idx===0) prevBtn.disabled = true;
+  var nextBtn;
+  if (idx < list.length-1){
+    nextBtn = el("button", { onclick:function(){ setView("stage", {track:state.track, stageIndex: idx+1}); } }, [text("Next Stage →")]);
+  } else {
+    var otherTrack = state.track === "primary" ? "secondary" : "compare";
+    nextBtn = el("button", { onclick:function(){
+      if (state.track === "primary") setView("stage", {track:"secondary", stageIndex:0});
+      else setView("compare");
+    } }, [text(state.track === "primary" ? "Next: Secondary Succession →" : "Next: Compare Both →")]);
+  }
+  var footer = el("div", {class:"stage-footer"}, [prevBtn, nextBtn]);
+
+  return el("div", {}, [header, timeline, grid, notesBox, footer]);
+}
+
+/* ---- Compare ---- */
+function renderCompare(){
+  var rows = [
+    ["Starting point", "Bare rock, lava, retreated glacier — no soil", "Burned forest/grassland — soil intact"],
+    ["Soil present?", "No — must form from scratch", "Yes — soil structure survives"],
+    ["Seed bank present?", "No", "Yes — seeds, roots, rhizomes survive"],
+    ["Typical pioneer species", "Lichens, mosses", "Grasses, fireweed, resprouting shrubs"],
+    ["Approx. time to climax", "1,000+ years", "100–150 years"],
+    ["Relative speed", "Very slow", "Much faster"],
+    ["Example trigger", "Glacial retreat, volcanic eruption", "Wildfire, logging, flood"]
+  ];
+  var table = el("table", {class:"compare-table"});
+  var thead = el("tr", {}, [el("th",{},[text("Feature")]), el("th",{},[text("Primary Succession")]), el("th",{},[text("Secondary Succession")])]);
+  table.appendChild(thead);
+  rows.forEach(function(r){
+    table.appendChild(el("tr", {}, [
+      el("td", {class:"label"}, [text(r[0])]),
+      el("td", {}, [text(r[1])]),
+      el("td", {}, [text(r[2])])
+    ]));
+  });
+
+  var caseStudy = el("div", {class:"case-study"}, [
+    el("h3", {}, [text("Case Study: The 1988 Yellowstone Fires")]),
+    el("p", {}, [text("In the summer of 1988, a combination of drought and high winds drove wildfires across roughly a third of Yellowstone National Park — one of the largest fire events in the park's recorded history. Many scientists and visitors expected a landscape left permanently scarred.")]),
+    el("p", {}, [text("Instead, secondary succession took over almost immediately. Lodgepole pine — the park's dominant tree — relies heavily on serotinous cones that had been sealed by resin for decades. The intense heat melted that resin, releasing enormous numbers of seeds onto a freshly cleared, sunlit, nutrient-rich forest floor. Wildflowers like fireweed appeared within the very first growing season, and dense stands of young lodgepole pine were well established within just a few years.")]),
+    el("div", {class:"stats"}, [
+      el("div", {class:"stat"}, [ el("div",{class:"n"},[text("~36%")]), el("div",{class:"l"},[text("of the park burned")]) ]),
+      el("div", {class:"stat"}, [ el("div",{class:"n"},[text("~793,000")]), el("div",{class:"l"},[text("acres affected")]) ]),
+      el("div", {class:"stat"}, [ el("div",{class:"n"},[text("Weeks")]), el("div",{class:"l"},[text("until first regrowth")]) ]),
+      el("div", {class:"stat"}, [ el("div",{class:"n"},[text("100–150 yrs")]), el("div",{class:"l"},[text("toward mature forest")]) ])
+    ])
+  ]);
+
+  var notesBox = notesBoxFor("compare_yellowstone", "Notes — Comparison & Case Study");
+
+  return el("div", {}, [
+    el("h2", {style:"color:var(--navy-deep);margin-bottom:14px;"}, [text("Primary vs. Secondary Succession")]),
+    table,
+    caseStudy,
+    notesBox
+  ]);
+}
+
+function notesBoxFor(id, label){
+  var savedTag = el("span", {class:"saved"}, [text("")]);
+  var ta = el("textarea", {placeholder:"Write your notes here... (autosaves as you type)"});
+  ta.value = loadNote(id);
+  ta.addEventListener("input", function(){
+    saveNote(id, ta.value);
+    savedTag.textContent = "Saved ✓";
+    clearTimeout(ta._t);
+    ta._t = setTimeout(function(){ savedTag.textContent = ""; }, 1500);
+  });
+  return el("div", {class:"notes-box"}, [
+    el("div", {class:"label"}, [ text(label), savedTag ]),
+    ta
+  ]);
+}
+
+/* ---- Quiz ---- */
+function renderQuiz(){
+  var wrap = el("div", {});
+  wrap.appendChild(el("h2", {style:"color:var(--navy-deep);margin-bottom:6px;"}, [text("Knowledge Check")]));
+  wrap.appendChild(el("p", {style:"font-family:Calibri,Arial,sans-serif;color:var(--ink-soft);margin-bottom:20px;"}, [text("Answer each question. Your choice will be marked correct or incorrect, with an explanation.")]));
+
+  var correctCount = 0;
+  var answeredCount = 0;
+
+  QUIZ.forEach(function(item, qi){
+    var card = el("div", {class:"quiz-card"});
+    card.appendChild(el("div", {class:"q"}, [text((qi+1) + ". " + item.q)]));
+    var expl = el("div", {class:"expl"}, [text(item.expl)]);
+    var answered = state.quizAnswers[qi] !== undefined;
+    if (answered && item.correct === state.quizAnswers[qi]) correctCount++;
+    if (answered) answeredCount++;
+
+    item.opts.forEach(function(opt, oi){
+      var cls = "opt";
+      if (answered){
+        if (oi === item.correct) cls += " correct";
+        else if (oi === state.quizAnswers[qi]) cls += " incorrect";
+      }
+      var btn = el("button", { class: cls, disabled: answered ? "disabled" : null, onclick:function(){
+        state.quizAnswers[qi] = oi;
+        render();
+      }}, [text(opt)]);
+      card.appendChild(btn);
+    });
+    if (answered){ expl.className = "expl show"; }
+    card.appendChild(expl);
+    wrap.appendChild(card);
+  });
+
+  if (answeredCount === QUIZ.length){
+    wrap.appendChild(el("div", {class:"quiz-score"}, [
+      el("div", {class:"n"}, [text(correctCount + " / " + QUIZ.length)]),
+      el("div", {}, [text("questions correct")])
+    ]));
+  }
+
+  return wrap;
+}
+
+/* ---- My Notes page ---- */
+function renderNotesPage(){
+  var header = el("div", {class:"notes-page-header"}, [
+    el("h2", {style:"color:var(--navy-deep);"}, [text("My Notes")]),
+    el("button", {class:"print-btn", onclick:function(){ window.print(); }}, [text("🖨 Print / Save Notes")])
+  ]);
+
+  var nameField = el("div", {class:"name-field"}, [
+    text("Name: "),
+    (function(){
+      var inp = el("input", {type:"text", placeholder:"Type your name"});
+      inp.value = loadName();
+      inp.addEventListener("input", function(){ saveName(inp.value); });
+      return inp;
+    })()
+  ]);
+
+  var wrap = el("div", {}, [header, nameField]);
+
+  var groups = [
+    {label:"Primary Succession", items: PRIMARY},
+    {label:"Secondary Succession (Fire)", items: SECONDARY}
+  ];
+
+  groups.forEach(function(g){
+    wrap.appendChild(el("h3", {style:"color:var(--navy-deep);margin:20px 0 10px;"}, [text(g.label)]));
+    g.items.forEach(function(stage){
+      var noteText = loadNote(stage.id);
+      wrap.appendChild(el("div", {class:"notes-summary-card"}, [
+        el("h4", {}, [text(stage.phase + ": " + stage.title)]),
+        el("div", {class:"tf"}, [text(stage.timeframe)]),
+        noteText ? el("div", {class:"txt"}, [text(noteText)]) : el("div", {class:"txt empty"}, [text("No notes yet — visit this stage to add some.")])
+      ]));
+    });
+  });
+
+  wrap.appendChild(el("h3", {style:"color:var(--navy-deep);margin:20px 0 10px;"}, [text("Comparison & Case Study")]));
+  var cmpNote = loadNote("compare_yellowstone");
+  wrap.appendChild(el("div", {class:"notes-summary-card"}, [
+    el("h4", {}, [text("Primary vs. Secondary + Yellowstone Case Study")]),
+    cmpNote ? el("div", {class:"txt"}, [text(cmpNote)]) : el("div", {class:"txt empty"}, [text("No notes yet — visit the Compare page to add some.")])
+  ]));
+
+  return wrap;
+}
+
+/* ============================================================
+   MAIN RENDER
+   ============================================================ */
+function render(){
+  app.innerHTML = "";
+  if (state.view === "cover"){
+    app.appendChild(el("main", {}, [renderCover()]));
+    return;
+  }
+  app.appendChild(topBar());
+  var main = el("main");
+  if (state.view === "home") main.appendChild(renderHome());
+  else if (state.view === "stage") main.appendChild(renderStage());
+  else if (state.view === "compare") main.appendChild(renderCompare());
+  else if (state.view === "quiz") main.appendChild(renderQuiz());
+  else if (state.view === "notes") main.appendChild(renderNotesPage());
+  app.appendChild(main);
+  app.appendChild(el("footer", {class:"appfoot"}, [text("Ecological Succession · AP Environmental Science · B. Henriques")]));
+}
+
+render();
+
+})();
+</script>
+</body>
+</html>
