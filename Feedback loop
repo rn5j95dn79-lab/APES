@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback Loop Explorer — AP Environmental Science</title>
+<style>
+  :root {
+    --forest: #1F3D2B;
+    --forest-mid: #2C5F2D;
+    --moss: #6B9362;
+    --moss-light: #97BC62;
+    --gold: #C98A2C;
+    --offwhite: #F4F5F1;
+    --ink: #1F2A22;
+    --gray: #5B6660;
+    --pos: #B5502F;
+    --pos-light: #F3E2D9;
+    --neg: #2E6E8E;
+    --neg-light: #DCE9EE;
+    --white: #FFFFFF;
+    --line: #DDE3DA;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Calibri, sans-serif;
+    background: var(--offwhite);
+    color: var(--ink);
+  }
+  header {
+    background: var(--forest);
+    color: var(--white);
+    padding: 28px 32px 24px;
+    text-align: center;
+  }
+  header .kicker {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--moss-light);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  header h1 {
+    font-family: Cambria, Georgia, serif;
+    font-size: 34px;
+    margin: 4px 0 8px;
+  }
+  header p {
+    font-size: 15px;
+    color: #D8E3D4;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .refresher {
+    max-width: 900px;
+    margin: -18px auto 0;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 22px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    box-shadow: 0 6px 18px rgba(31,61,43,0.08);
+    position: relative;
+    z-index: 2;
+  }
+  .refresher .pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+  }
+  .refresher .swatch {
+    width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0;
+  }
+  .refresher .swatch.neg { background: var(--neg); }
+  .refresher .swatch.pos { background: var(--pos); }
+  .refresher b { color: var(--forest); }
+
+  .tabs {
+    max-width: 900px;
+    margin: 26px auto 0;
+    display: flex;
+    gap: 10px;
+    padding: 0 20px;
+  }
+  .tab {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 10px 10px 0 0;
+    background: #E4E9E0;
+    color: var(--gray);
+    font-weight: 700;
+    font-size: 14.5px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s, color 0.15s;
+  }
+  .tab.active {
+    background: var(--white);
+    color: var(--forest);
+  }
+  main {
+    max-width: 900px;
+    margin: 0 auto 60px;
+    background: var(--white);
+    padding: 30px 26px 40px;
+    border-radius: 0 0 14px 14px;
+    box-shadow: 0 10px 30px rgba(31,61,43,0.07);
+  }
+
+  /* ---------- Explore mode ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 14px;
+    cursor: pointer;
+    background: var(--offwhite);
+    transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+    text-align: center;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(31,61,43,0.12);
+    border-color: var(--moss);
+  }
+  .card .emoji { font-size: 32px; display: block; margin-bottom: 8px; }
+  .card .title { font-weight: 700; color: var(--forest); font-size: 14.5px; }
+  .card .sub { font-size: 11.5px; color: var(--gray); margin-top: 4px; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--moss);
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 13.5px;
+    padding: 0 0 16px;
+  }
+  .scenario-title {
+    font-family: Cambria, Georgia, serif;
+    font-size: 26px;
+    color: var(--forest);
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .scenario-hint {
+    color: var(--gray);
+    font-size: 13.5px;
+    margin-bottom: 22px;
+  }
+
+  .chain {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+    min-height: 90px;
+  }
+  .node {
+    flex: 1 1 170px;
+    min-width: 150px;
+    background: var(--white);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.35s ease, transform 0.35s ease, border-color 0.3s;
+  }
+  .node.shown { opacity: 1; transform: translateY(0); border-color: var(--moss); }
+  .arrow {
+    font-size: 20px;
+    color: var(--moss);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    flex: 0 0 auto;
+  }
+  .arrow.shown { opacity: 1; }
+
+  .loopback {
+    background: var(--moss);
+    color: var(--white);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .loopback.shown { opacity: 1; transform: translateY(0); }
+
+  .step-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  button.primary {
+    background: var(--forest);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 11px 20px;
+    font-weight: 700;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button.primary:hover { background: var(--forest-mid); }
+  button.primary:disabled { background: #BFC9BE; cursor: not-allowed; }
+  button.ghost {
+    background: var(--white);
+    color: var(--forest);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 20px;
+    font-weight: 700;
+    font-size: 13.5px;
+    cursor: pointer;
+  }
+  button.ghost:hover { border-color: var(--moss); }
+
+  .guess-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .guess-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid var(--line);
+    background: var(--white);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .guess-btn.neg-opt:hover { border-color: var(--neg); background: var(--neg-light); }
+  .guess-btn.pos-opt:hover { border-color: var(--pos); background: var(--pos-light); }
+  .guess-btn:disabled { cursor: default; }
+  .guess-btn.correct { border-color: var(--moss); background: #E4EBDE; }
+  .guess-btn.wrong { border-color: #C2554A; background: #F7E3E0; opacity: 0.7; }
+
+  .reveal-box {
+    display: none;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 10px;
+  }
+  .reveal-box.show { display: block; }
+  .reveal-box.pos { background: var(--pos-light); border: 1px solid #E0B49B; }
+  .reveal-box.neg { background: var(--neg-light); border: 1px solid #A9CBDB; }
+  .reveal-box .verdict {
+    font-weight: 800;
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  .reveal-box.pos .verdict { color: var(--pos); }
+  .reveal-box.neg .verdict { color: var(--neg); }
+  .reveal-box p { margin: 0; font-size: 13.5px; line-height: 1.5; color: #33403A; }
+
+  /* ---------- Quiz mode ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--gray);
+    font-weight: 700;
+  }
+  .progress-track {
+    height: 8px;
+    background: #E4E9E0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--moss);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+  .score-badge {
+    background: var(--gold);
+    color: var(--white);
+    border-radius: 999px;
+    padding: 3px 12px;
+    font-size: 12.5px;
+  }
+  .quiz-end {
+    text-align: center;
+    padding: 30px 10px;
+    display: none;
+  }
+  .quiz-end.show { display: block; }
+  .quiz-end .big-score {
+    font-family: Cambria, Georgia, serif;
+    font-size: 52px;
+    color: var(--forest);
+    font-weight: 700;
+  }
+  .quiz-end p { color: var(--gray); font-size: 14px; }
+
+  footer {
+    text-align: center;
+    padding: 18px;
+    font-size: 11.5px;
+    color: var(--gray);
+  }
+
+  @media (max-width: 600px) {
+    header h1 { font-size: 26px; }
+    .chain { flex-direction: column; }
+    .arrow { transform: rotate(90deg); }
+    .guess-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">AP Environmental Science &bull; Systems &amp; Feedback</div>
+  <h1>Feedback Loop Explorer</h1>
+  <p>Step through eight real feedback loops, then test yourself — is each one amplifying (positive) or correcting (negative)?</p>
+</header>
+
+<div class="refresher">
+  <div class="pill"><span class="swatch neg"></span> <span><b>Negative feedback</b> corrects a change</span></div>
+  <div class="pill"><span class="swatch pos"></span> <span><b>Positive feedback</b> amplifies a change</span></div>
+  <div class="pill">🚫 Neither one means "good" or "bad" — that's a separate question.</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" id="tab-explore" onclick="switchTab('explore')">🔍 Explore</button>
+  <button class="tab" id="tab-quiz" onclick="switchTab('quiz')">🎯 Quiz Me</button>
+</div>
+
+<main>
+  <!-- EXPLORE MODE -->
+  <div id="explore-mode">
+    <div id="explore-grid" class="panel active">
+      <div class="grid" id="scenario-grid"></div>
+    </div>
+    <div id="explore-detail" class="panel">
+      <button class="back-btn" onclick="showGrid()">&larr; Back to all scenarios</button>
+      <h2 class="scenario-title"><span id="detail-emoji"></span><span id="detail-title"></span></h2>
+      <p class="scenario-hint">Click "Next step" to build the loop one link at a time.</p>
+      <div class="chain" id="detail-chain"></div>
+      <div class="loopback" id="detail-loopback"></div>
+      <div class="step-controls">
+        <button class="primary" id="next-step-btn" onclick="nextStep()">Next step &rarr;</button>
+        <button class="ghost" id="reveal-type-btn" onclick="revealExploreAnswer()" style="display:none;">Reveal: positive or negative?</button>
+      </div>
+      <div class="reveal-box" id="explore-reveal"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ MODE -->
+  <div id="quiz-mode" style="display:none;">
+    <div id="quiz-active">
+      <div class="quiz-top">
+        <span id="quiz-progress-label">Question 1 of 8</span>
+        <span class="score-badge" id="quiz-score">Score: 0/0</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="quiz-progress-fill"></div></div>
+
+      <h2 class="scenario-title"><span id="quiz-emoji"></span><span id="quiz-title"></span></h2>
+      <div class="chain" id="quiz-chain"></div>
+      <div class="loopback shown" id="quiz-loopback"></div>
+
+      <div class="guess-row">
+        <button class="guess-btn neg-opt" id="quiz-neg-btn" onclick="answerQuiz('negative')">🔵 Negative Feedback</button>
+        <button class="guess-btn pos-opt" id="quiz-pos-btn" onclick="answerQuiz('positive')">🟠 Positive Feedback</button>
+      </div>
+
+      <div class="reveal-box" id="quiz-reveal"></div>
+      <button class="primary" id="quiz-next-btn" style="display:none;" onclick="nextQuizQuestion()">Next question &rarr;</button>
+    </div>
+
+    <div class="quiz-end" id="quiz-end">
+      <div class="big-score" id="final-score"></div>
+      <p id="final-msg"></p>
+      <button class="primary" onclick="startQuiz()">Shuffle &amp; try again</button>
+    </div>
+  </div>
+</main>
+
+<footer>Feedback Loop Explorer &middot; AP Environmental Science &middot; built to accompany the Feedback Loops deck &amp; worksheet</footer>
+
+<script>
+const SCENARIOS = [
+  {
+    id: "coral", title: "Coral Bleaching", emoji: "🪸", type: "positive",
+    nodes: ["Ocean water warms above normal", "Coral expels its symbiotic algae", "Coral loses its main energy source", "Coral grows weaker and more heat-sensitive"],
+    loop: "…which makes the coral even more likely to bleach the next time water warms.",
+    explain: "Bleaching doesn't fix the heat stress — it leaves the coral with less energy to cope, so each round of warming does more damage than the last. Nothing here restores the coral to its original healthy state."
+  },
+  {
+    id: "heat-island", title: "Urban Heat Island & A/C", emoji: "🏙️", type: "positive",
+    nodes: ["City temperatures rise", "Residents run air conditioning more", "A/C units pump waste heat into the street", "Outdoor city temperatures rise further"],
+    loop: "…which drives even more air conditioning use — the heat keeps compounding.",
+    explain: "Cooling the inside of buildings means pumping heat outside. In a dense city, that exhausted heat adds up, warming the same streets people are trying to escape — amplifying the original problem."
+  },
+  {
+    id: "dust-drought", title: "Drought & Dust (Sahel)", emoji: "🏜️", type: "positive",
+    nodes: ["A drought kills off ground vegetation", "Bare soil is exposed to wind", "Dust storms rise into the atmosphere", "Dust suppresses the rain clouds that would end the drought"],
+    loop: "…which leaves the ground even barer and dustier — deepening the next drought.",
+    explain: "Vegetation normally holds soil in place and helps generate local rainfall. Once it's gone, dust in the air interferes with rain-cloud formation, making the drought that caused the dust worse."
+  },
+  {
+    id: "invasive", title: "Invasive Species Spread", emoji: "🐌", type: "positive",
+    nodes: ["An invasive species establishes in an area", "It outcompetes native plants or animals", "Native populations shrink", "Fewer natives remain to compete with the invader"],
+    loop: "…which lets the invasive species spread even faster into the space natives used to hold.",
+    explain: "Each native species lost removes one more check on the invader. With less competition, the invasive population expands its advantage instead of leveling off."
+  },
+  {
+    id: "locust", title: "Locust Boom & Bust", emoji: "🦗", type: "negative",
+    nodes: ["Heavy rain triggers plant growth", "Locusts feed and reproduce rapidly", "The swarm strips the vegetation bare", "Food becomes scarce and the swarm collapses"],
+    loop: "…which brings the locust population back down — clearing the way for plants (and locusts) to slowly rebound.",
+    explain: "The boom creates the conditions for its own bust: more locusts eat more food, until there isn't enough left to support them. The population is pulled back down toward what the land can support."
+  },
+  {
+    id: "clouds", title: "Cloud Cover & Temperature", emoji: "☁️", type: "negative",
+    nodes: ["Rising temperatures increase evaporation", "More water vapor forms low clouds", "Low clouds reflect sunlight back to space", "Less sunlight reaches the surface"],
+    loop: "…which takes some heat back out of the system, partly offsetting the warming that started it.",
+    explain: "Not all clouds behave the same way, but low, thick clouds mostly reflect incoming sunlight. More of them means less energy reaching the surface — a check on the original warming, not an amplifier."
+  },
+  {
+    id: "bloodph", title: "Blood pH & Breathing Rate", emoji: "🫁", type: "negative",
+    nodes: ["CO2 builds up in the blood", "Blood becomes more acidic", "Chemoreceptors detect the pH change", "Breathing rate increases to exhale more CO2"],
+    loop: "…which brings blood pH back toward normal — the change is corrected.",
+    explain: "Your body is constantly sensing small deviations and pushing back against them. Faster breathing clears the excess CO2 that caused the problem, restoring balance."
+  },
+  {
+    id: "wolves", title: "Yellowstone Wolves & Willows", emoji: "🐺", type: "negative",
+    nodes: ["Wolves are reintroduced to the ecosystem", "Elk avoid open riverbanks more often", "Willow and aspen seedlings survive and grow", "Streamside habitat stabilizes"],
+    loop: "…which supports beavers and songbirds, holding the riverbank ecosystem steady instead of letting it erode further.",
+    explain: "Wolves don't need to eliminate elk to change the system — just changing elk behavior lets vegetation recover, which stabilizes the riverbank. The system settles toward a new balance instead of continuing to degrade."
+  }
+];
+
+/* ---------------- Explore mode ---------------- */
+let currentScenario = null;
+let stepIndex = 0;
+
+function buildGrid() {
+  const grid = document.getElementById('scenario-grid');
+  grid.innerHTML = '';
+  SCENARIOS.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.onclick = () => openScenario(s.id);
+    card.innerHTML = `<span class="emoji">${s.emoji}</span><div class="title">${s.title}</div><div class="sub">Click to trace the loop</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function showGrid() {
+  document.getElementById('explore-grid').classList.add('active');
+  document.getElementById('explore-detail').classList.remove('active');
+}
+
+function openScenario(id) {
+  currentScenario = SCENARIOS.find(s => s.id === id);
+  stepIndex = 0;
+  document.getElementById('explore-grid').classList.remove('active');
+  document.getElementById('explore-detail').classList.add('active');
+  document.getElementById('detail-emoji').textContent = currentScenario.emoji;
+  document.getElementById('detail-title').textContent = currentScenario.title;
+
+  const chain = document.getElementById('detail-chain');
+  chain.innerHTML = '';
+  currentScenario.nodes.forEach((n, i) => {
+    const node = document.createElement('div');
+    node.className = 'node';
+    node.id = 'e-node-' + i;
+    node.textContent = n;
+    chain.appendChild(node);
+    if (i < currentScenario.nodes.length - 1) {
+      const arrow = document.createElement('div');
+      arrow.className = 'arrow';
+      arrow.id = 'e-arrow-' + i;
+      arrow.textContent = '➜';
+      chain.appendChild(arrow);
+    }
+  });
+
+  const lb = document.getElementById('detail-loopback');
+  lb.textContent = '↺ ' + currentScenario.loop;
+  lb.classList.remove('shown');
+
+  document.getElementById('next-step-btn').style.display = 'inline-block';
+  document.getElementById('next-step-btn').disabled = false;
+  document.getElementById('reveal-type-btn').style.display = 'none';
+  document.getElementById('explore-reveal').classList.remove('show', 'pos', 'neg');
+}
+
+function nextStep() {
+  const total = currentScenario.nodes.length;
+  if (stepIndex < total) {
+    document.getElementById('e-node-' + stepIndex).classList.add('shown');
+    if (stepIndex > 0) document.getElementById('e-arrow-' + (stepIndex - 1)).classList.add('shown');
+    stepIndex++;
+  }
+  if (stepIndex >= total) {
+    document.getElementById('detail-loopback').classList.add('shown');
+    document.getElementById('next-step-btn').disabled = true;
+    document.getElementById('reveal-type-btn').style.display = 'inline-block';
+  }
+}
+
+function revealExploreAnswer() {
+  const box = document.getElementById('explore-reveal');
+  const type = currentScenario.type;
+  box.classList.add('show', type === 'positive' ? 'pos' : 'neg');
+  box.innerHTML = `<div class="verdict">${type === 'positive' ? '🟠 POSITIVE' : '🔵 NEGATIVE'} FEEDBACK</div><p>${currentScenario.explain}</p>`;
+  document.getElementById('reveal-type-btn').style.display = 'none';
+}
+
+/* ---------------- Tabs ---------------- */
+function switchTab(which) {
+  document.getElementById('tab-explore').classList.toggle('active', which === 'explore');
+  document.getElementById('tab-quiz').classList.toggle('active', which === 'quiz');
+  document.getElementById('explore-mode').style.display = which === 'explore' ? 'block' : 'none';
+  document.getElementById('quiz-mode').style.display = which === 'quiz' ? 'block' : 'none';
+  if (which === 'quiz' && !quizStarted) startQuiz();
+}
+
+/* ---------------- Quiz mode ---------------- */
+let quizOrder = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizAnswered = false;
+let quizStarted = false;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  quizStarted = true;
+  quizOrder = shuffle(SCENARIOS);
+  quizIndex = 0;
+  quizScore = 0;
+  document.getElementById('quiz-active').style.display = 'block';
+  document.getElementById('quiz-end').classList.remove('show');
+  loadQuizQuestion();
+}
+
+function loadQuizQuestion() {
+  quizAnswered = false;
+  const s = quizOrder[quizIndex];
+  document.getElementById('quiz-progress-label').textContent = `Question ${quizIndex + 1} of ${quizOrder.length}`;
+  document.getElementById('quiz-score').textContent = `Score: ${quizScore}/${quizIndex}`;
+  document.getElementById('quiz-progress-fill').style.width = (quizIndex / quizOrder.length * 100) + '%';
+
+  document.getElementById('quiz-emoji').textContent = s.emoji;
+  document.getElementById('quiz-title').textContent = s.title;
+
+  const chain = document.getElementById('quiz-chain');
+  chain.innerHTML = '';
+  s.nodes.forEach((n, i) => {
+    const node = document.createElement('div');
+    node.className = 'node shown';
+    node.textContent = n;
+    chain.appendChild(node);
+    if (i < s.nodes.length - 1) {
+      const arrow = document.createElement('div');
+      arrow.className = 'arrow shown';
+      arrow.textContent = '➜';
+      chain.appendChild(arrow);
+    }
+  });
+  document.getElementById('quiz-loopback').textContent = '↺ ' + s.loop;
+
+  const negBtn = document.getElementById('quiz-neg-btn');
+  const posBtn = document.getElementById('quiz-pos-btn');
+  [negBtn, posBtn].forEach(b => { b.disabled = false; b.classList.remove('correct', 'wrong'); });
+
+  const reveal = document.getElementById('quiz-reveal');
+  reveal.classList.remove('show', 'pos', 'neg');
+  document.getElementById('quiz-next-btn').style.display = 'none';
+}
+
+function answerQuiz(choice) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const s = quizOrder[quizIndex];
+  const correct = choice === s.type;
+  if (correct) quizScore++;
+
+  const negBtn = document.getElementById('quiz-neg-btn');
+  const posBtn = document.getElementById('quiz-pos-btn');
+  const chosenBtn = choice === 'negative' ? negBtn : posBtn;
+  const correctBtn = s.type === 'negative' ? negBtn : posBtn;
+  correctBtn.classList.add('correct');
+  if (!correct) chosenBtn.classList.add('wrong');
+  negBtn.disabled = true;
+  posBtn.disabled = true;
+
+  const reveal = document.getElementById('quiz-reveal');
+  reveal.classList.add('show', s.type === 'positive' ? 'pos' : 'neg');
+  reveal.innerHTML = `<div class="verdict">${correct ? '✅ Correct — ' : '❌ Not quite — '}${s.type === 'positive' ? 'POSITIVE' : 'NEGATIVE'} FEEDBACK</div><p>${s.explain}</p>`;
+
+  document.getElementById('quiz-score').textContent = `Score: ${quizScore}/${quizIndex + 1}`;
+  document.getElementById('quiz-next-btn').style.display = 'inline-block';
+}
+
+function nextQuizQuestion() {
+  quizIndex++;
+  if (quizIndex >= quizOrder.length) {
+    document.getElementById('quiz-progress-fill').style.width = '100%';
+    document.getElementById('quiz-active').querySelector('.chain').innerHTML = '';
+    endQuiz();
+  } else {
+    loadQuizQuestion();
+  }
+}
+
+function endQuiz() {
+  document.getElementById('quiz-active').style.display = 'none';
+  const end = document.getElementById('quiz-end');
+  end.classList.add('show');
+  document.getElementById('final-score').textContent = `${quizScore} / ${quizOrder.length}`;
+  let msg = "Take another pass — mix up the order and try again.";
+  if (quizScore === quizOrder.length) msg = "Perfect score! You've got positive vs. negative feedback down.";
+  else if (quizScore >= quizOrder.length - 2) msg = "Great work — just a couple to review.";
+  document.getElementById('final-msg').textContent = msg;
+}
+
+buildGrid();
+</script>
+
+</body>
+</html>
